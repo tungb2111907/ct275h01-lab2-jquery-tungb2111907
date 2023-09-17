@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Index</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }
+        .pokemon-info-container {
+            border: 1px solid #a6a8aa;
+            padding: 35px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        #pokemonIndex {
+            text-align: center;
+            margin-top: 28px;
+        }
+
+        #pokemonImage {
+            max-width: 100%;
+        }
+
+        #searchButton {
+            cursor: pointer;
+            color: white;
+            background-color: #0074cc;
+            border: none;
+            padding: 10px 20px;
+        }
+
+        #searchButton:hover {
+            background-color: #0f3958;
+        }
+
+        #pokemonName {
+            margin-right: 10px;
+            width: 200px; 
+            padding: 10px; 
+        }
+
+        #pokemonNameResult {
+            color: #008000;
+            font-weight: bold;
+        }
+       .pokemon-attribute-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pokemon-attribute {
+            flex: 1;
+            margin: 5px;
+            text-align: center;
+        }
+        .pokemon-type {
+            white-space: nowrap;
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        .pokemon-type-label {
+            font-size: 30px;
+            color: #ffcc00;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pokemon Index</h1>
+    <form id="searchForm">
+        <input type="text" id="pokemonName" placeholder="Nhập tên Pokemon">
+        <button type="button" id="searchButton">Tìm</button>
+    </form>
+    <div class="pokemon-info-container" id="pokemonInfo">
+    <div id="pokemonIndex"></div>
+
+    <script>
+        document.getElementById('searchButton').addEventListener('click', searchPokemon);
+        document.getElementById('pokemonName').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                searchPokemon();
+            }
+        });
+        function searchPokemon() {
+            const pokemonName = document.getElementById('pokemonName').value.toLowerCase();
+            const apiUrl = `https://pokeapi.co/api/v2/pokemon/${pokemonName}`;
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Pokemon không tồn tại');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const pokemonInfo = document.getElementById('pokemonIndex');
+                    pokemonInfo.innerHTML = `
+                        <h2><span id="pokemonNameResult">${data.name.toUpperCase()}</span></h2>
+                        <img id="pokemonImage" src="${data.sprites.front_default}" alt="${data.name}">
+                        <img id="pokemonImage" src="${data.sprites.back_default}" alt="${data.name}">
+                        <p class="pokemon-attribute"><span class="pokemon-type-label">Types</span></p>
+                         ${data.types.map(type => `<p class="pokemon-attribute"><span class="pokemon-type">${type.type.name}</span></p>`).join('')}
+                    `;
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert('Không tìm thấy Pokemon');
+                });
+        }
+    </script>
+</body>
+</html>
